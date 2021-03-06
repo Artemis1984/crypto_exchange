@@ -164,7 +164,7 @@ while True:
 
     # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
     # print(time.time() - start)
-    if total_profit > 10:
+    if total_profit > 80:
         max_profit += total_profit
         print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
         long = 0

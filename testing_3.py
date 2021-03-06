@@ -4,6 +4,7 @@ import asyncio
 import aiohttp
 import json
 import time
+from pprint import pprint
 
 
 # ACDX API https://docs.acdx.io/?python#get-order-book-level-2
@@ -129,48 +130,64 @@ while True:
     bid_list = dict()
     for i in data_list:
         if i == 'https://api.acdx.io/v1/contracts/BTC-PERP/book':
-            ask_list['acdx'] = []
-            ask_list['acdx'].append(float(data_list[i]['asks'][0][0]))
-            ask_list['acdx'].append(float(data_list[i]['asks'][0][1]))
-
-            bid_list['acdx'] = []
-            bid_list['acdx'].append(float(data_list[i]['bids'][0][0]))
-            bid_list['acdx'].append(float(data_list[i]['bids'][0][1]))
+            try:
+                ask_list['acdx'] = []
+                ask_list['acdx'].append(float(data_list[i]['asks'][0][0]))
+                ask_list['acdx'].append(float(data_list[i]['asks'][0][1]))
+            except:
+                pass
+            try:
+                bid_list['acdx'] = []
+                bid_list['acdx'].append(float(data_list[i]['bids'][0][0]))
+                bid_list['acdx'].append(float(data_list[i]['bids'][0][1]))
+            except:
+                pass
 
         elif i == 'https://apiv2.bitz.com/Market/getContractOrderBook?contractId=101&depth=5':
-            ask_list['bitz'] = []
-            ask_list['bitz'].append(float(data_list[i]['data']['asks'][0]['price']))
-            ask_list['bitz'].append(float(data_list[i]['data']['asks'][0]['amount']))
+            try:
+                ask_list['bitz'] = []
+                ask_list['bitz'].append(float(data_list[i]['data']['asks'][0]['price']))
+                ask_list['bitz'].append(float(data_list[i]['data']['asks'][0]['amount']))
+            except:
+                pass
+            try:
+                bid_list['bitz'] = []
+                bid_list['bitz'].append(float(data_list[i]['data']['bids'][0]['price']))
+                bid_list['bitz'].append(float(data_list[i]['data']['bids'][0]['amount']))
+            except:
+                pass
 
-            bid_list['bitz'] = []
-            bid_list['bitz'].append(float(data_list[i]['data']['bids'][0]['price']))
-            bid_list['bitz'].append(float(data_list[i]['data']['bids'][0]['amount']))
+    # print(bid_list)
+    # print(ask_list)
+    # pprint(data_list)
+    try:
+        if not long and not short:
+            if bid_list['bitz'][0] > ask_list['acdx'][0]:
+                short = bid_list['bitz'][0]
+                short_platform = 'bitz'
+                long = ask_list['acdx'][0]
+                long_platform = 'acdx'
+            else:
+                long = ask_list['bitz'][0]
+                long_platform = 'bitz'
+                short = bid_list['acdx'][0]
+                short_platform = 'acdx'
 
-    if not long and not short:
-        if bid_list['bitz'][0] > ask_list['acdx'][0]:
-            short = bid_list['bitz'][0]
-            short_platform = 'bitz'
-            long = ask_list['acdx'][0]
-            long_platform = 'acdx'
-        else:
-            long = ask_list['bitz'][0]
-            long_platform = 'bitz'
-            short = bid_list['acdx'][0]
-            short_platform = 'acdx'
+            print(long_platform, 'long', long, short_platform, 'short', short)
 
-        print(long_platform, 'long', long, short_platform, 'short', short)
+        long_profit = bid_list[long_platform][0] - long
+        short_profit = short - ask_list[short_platform][0]
+        total_profit = long_profit + short_profit
 
-    long_profit = bid_list[long_platform][0] - long
-    short_profit = short - ask_list[short_platform][0]
-    total_profit = long_profit + short_profit
-
-    # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
-    # print(time.time() - start)
-    if total_profit > 10:
-        max_profit += total_profit
-        print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
-        long = 0
-        short = 0
+        # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
+        # print(time.time() - start)
+        if total_profit > 80:
+            max_profit += total_profit
+            print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
+            long = 0
+            short = 0
+    except:
+        pass
 
 
 # import websocket
