@@ -173,17 +173,20 @@ while True:
                 short = bid_list['acdx'][0]
                 short_platform = 'acdx'
 
-            print(long_platform, 'long', long, short_platform, 'short', short)
+            print(long_platform, 'long', long, short_platform, 'short', short, 'time', datetime.datetime.now())
 
+        fees = {'bitz': 0.06, 'acdx': 0.05}
         long_profit = bid_list[long_platform][0] - long
         short_profit = short - ask_list[short_platform][0]
         total_profit = long_profit + short_profit
+        clear_profit = total_profit - ((long * (fees[long_platform] * 2) / 100) + (short * (fees[short_platform] * 2) / 100))
 
         # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
         # print(time.time() - start)
-        if total_profit > 80:
-            max_profit += total_profit
-            print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
+        if clear_profit > 0:
+            max_profit += clear_profit
+            # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
+            print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, clear profit {clear_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
             long = 0
             short = 0
     except:

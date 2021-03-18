@@ -228,7 +228,7 @@ import websocket
 # async futures test
 links = [
          'https://www.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=10',
-         'https://api.bybit.com/v2/public/orderBook/L2?symbol=BTCUSDT'
+         'https://api.bybit.com/v2/public/tickers?symbol=BTCUSDT'
          ]
 
 data_list = dict()
@@ -305,17 +305,20 @@ while True:
             short = bid_list['binance'][0]
             short_platform = 'binance'
 
-        print(long_platform, 'long', long, short_platform, 'short', short)
+        print(long_platform, 'long', long, short_platform, 'short', short, 'time', datetime.datetime.now())
 
+    fees = {'binance': 0.04, 'bybit': 0.075}
     long_profit = bid_list[long_platform][0] - long
     short_profit = short - ask_list[short_platform][0]
     total_profit = long_profit + short_profit
-
+    clear_profit = total_profit - ((long * fees[long_platform] / 100) + (short * fees[short_platform] / 100))
     # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
+    # print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, clear profit {clear_profit}, Прибыль за сессию , time {datetime.datetime.now()}')
     # print(time.time() - start)
-    if total_profit > 80:
-        max_profit += total_profit
-        print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
+    # if total_profit > 80:
+    if clear_profit > 0:
+        max_profit += clear_profit
+        print(f'{long_platform} long profit {long_profit}, {short_platform} short profit {short_profit}, total profit {total_profit}, clear profit {clear_profit}, Прибыль за сессию {max_profit}, time {datetime.datetime.now()}')
         long = 0
         short = 0
 
